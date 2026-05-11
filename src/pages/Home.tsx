@@ -1,138 +1,216 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import ProductCard from "@/components/shared/ProductCard";
 import { CATEGORIES, PRODUCTS } from "@/data/products";
 
-const HERO_IMAGE = "https://cdn.poehali.dev/projects/62df8b64-52d2-4caa-b427-9351100f1ee1/files/b8e41b8c-03e1-49a6-aea3-47c73ee626ec.jpg";
+const HERO_IMG = "https://cdn.poehali.dev/projects/62df8b64-52d2-4caa-b427-9351100f1ee1/files/b8e41b8c-03e1-49a6-aea3-47c73ee626ec.jpg";
 
-const TRUST_ITEMS = [
-  { icon: "Shield", title: "Гарантия качества", desc: "Все товары сертифицированы" },
-  { icon: "Truck", title: "Доставка по Москве", desc: "Газель, Манипулятор" },
-  { icon: "RotateCcw", title: "Возврат 14 дней", desc: "Без вопросов и бюрократии" },
-  { icon: "Headphones", title: "Поддержка 7/7", desc: "Эксперты ответят на вопросы" },
+const TRUST = [
+  { icon: "ShieldCheck", title: "Гарантия качества", desc: "Сертифицированные товары" },
+  { icon: "Truck", title: "Доставка по Москве", desc: "Газель или Манипулятор" },
+  { icon: "RotateCcw", title: "Возврат 14 дней", desc: "Без лишних вопросов" },
+  { icon: "HeadphonesIcon", title: "Поддержка 7/7", desc: "Эксперты ответят быстро" },
 ];
 
-const PROMO_PRODUCTS = PRODUCTS.filter((p) => p.discount);
+const PROMO = PRODUCTS.filter((p) => p.discount);
+const POPULAR = PRODUCTS.slice(0, 6);
 
 export default function Home() {
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const navigate = useNavigate();
-
   return (
-    <main>
-      {/* HERO */}
-      <section className="relative min-h-[520px] flex items-center diagonal-cut overflow-hidden">
+    <main style={{ background: "var(--ios-bg)" }}>
+      {/* ─── HERO ─── */}
+      <section className="relative overflow-hidden" style={{ minHeight: 540 }}>
         <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${HERO_IMAGE})` }}
+          className="absolute inset-0 bg-cover bg-center scale-105"
+          style={{ backgroundImage: `url(${HERO_IMG})`, filter: "brightness(0.35)" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/95 via-brand-dark/70 to-transparent" />
+        {/* Grain overlay */}
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
+          }}
+        />
 
-        <div className="relative container mx-auto px-4 py-20">
-          <div className="max-w-xl">
-            <div className="inline-flex items-center gap-2 bg-brand-orange/20 border border-brand-orange/40 rounded-full px-4 py-1.5 mb-6">
-              <div className="w-2 h-2 bg-brand-orange rounded-full animate-pulse" />
-              <span className="text-brand-orange text-sm font-medium">Более 5000 товаров в наличии</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-oswald font-bold text-white uppercase leading-tight mb-4">
-              Строй без<br />
-              <span className="text-gradient-orange">лишних слов</span>
-            </h1>
-            <p className="text-gray-300 text-lg mb-8 leading-relaxed">
-              Профессиональные стройматериалы для прорабов и мастеров. Доставка газелью или манипулятором.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                to="/catalog"
-                className="flex items-center justify-center gap-2 bg-brand-orange hover:bg-brand-orange-light text-white font-bold py-4 px-8 rounded-xl text-lg transition-all hover:scale-105 shadow-lg"
-              >
-                <Icon name="Grid3X3" size={20} />
-                Весь каталог
-              </Link>
-              <Link
-                to="/promotions"
-                className="flex items-center justify-center gap-2 border-2 border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white font-bold py-4 px-8 rounded-xl text-lg transition-all"
-              >
-                <Icon name="Percent" size={20} />
-                Акции
-              </Link>
-            </div>
+        <div className="relative container mx-auto px-4 pt-20 pb-28 flex flex-col items-start">
+          {/* Eyebrow badge */}
+          <div
+            className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-7 animate-fade-up"
+            style={{ background: "rgba(255,214,10,0.15)", border: "1px solid rgba(255,214,10,0.4)" }}
+          >
+            <span className="w-2 h-2 rounded-full bg-[var(--ios-yellow)] animate-pulse" />
+            <span className="text-xs font-bold text-[var(--ios-yellow)] tracking-wider uppercase">
+              Более 5 000 товаров в наличии
+            </span>
           </div>
-        </div>
-      </section>
 
-      {/* Delivery calculator */}
-      <section className="container mx-auto px-4 -mt-6 mb-12 relative z-10">
-        <div className="bg-brand-dark rounded-2xl p-6 border border-brand-charcoal shadow-2xl max-w-3xl mx-auto">
-          <h2 className="text-white font-oswald font-bold text-xl uppercase mb-4 flex items-center gap-2">
-            <Icon name="Truck" size={20} className="text-brand-orange" />
-            Быстрый расчёт доставки
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input
-              type="text"
-              placeholder="Откуда (склад)"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-              className="bg-brand-charcoal text-white placeholder-gray-500 rounded-lg px-4 py-3 text-sm border border-brand-gray focus:border-brand-orange focus:outline-none"
-            />
-            <input
-              type="text"
-              placeholder="Адрес доставки"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-              className="bg-brand-charcoal text-white placeholder-gray-500 rounded-lg px-4 py-3 text-sm border border-brand-gray focus:border-brand-orange focus:outline-none"
-            />
+          <h1
+            className="text-white font-extrabold mb-5 animate-fade-up delay-100"
+            style={{
+              fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.05,
+              maxWidth: 640,
+            }}
+          >
+            Материалы для{" "}
+            <span style={{ color: "var(--ios-yellow)" }}>настоящего</span>{" "}
+            строителя
+          </h1>
+
+          <p
+            className="text-lg mb-8 animate-fade-up delay-200"
+            style={{ color: "rgba(255,255,255,0.65)", maxWidth: 460, lineHeight: 1.6 }}
+          >
+            Профессиональный инструмент и стройматериалы. Доставка газелью или манипулятором.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 animate-fade-up delay-300">
             <Link
-              to="/delivery"
-              className="flex items-center justify-center gap-2 bg-brand-orange hover:bg-brand-orange-light text-white font-bold py-3 px-6 rounded-lg transition-colors"
+              to="/catalog"
+              className="btn-yellow tappable flex items-center gap-2.5 px-8 py-4 text-base font-bold"
+              style={{ borderRadius: 16 }}
             >
-              <Icon name="Calculator" size={16} />
-              Рассчитать
+              <Icon name="Grid3X3" size={18} />
+              Весь каталог
+            </Link>
+            <Link
+              to="/promotions"
+              className="tappable flex items-center gap-2.5 px-8 py-4 text-base font-bold text-white"
+              style={{
+                borderRadius: 16,
+                background: "rgba(255,255,255,0.12)",
+                backdropFilter: "blur(10px)",
+                border: "1.5px solid rgba(255,255,255,0.2)",
+              }}
+            >
+              <Icon name="Percent" size={18} />
+              Акции
             </Link>
           </div>
         </div>
+
+        {/* Stats bar */}
+        <div
+          className="absolute bottom-0 left-0 right-0 glass"
+          style={{ borderRadius: 0 }}
+        >
+          <div className="container mx-auto px-4 py-4">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              {[
+                { num: "5 000+", label: "товаров" },
+                { num: "24 ч", label: "доставка" },
+                { num: "8 лет", label: "на рынке" },
+              ].map((s) => (
+                <div key={s.label}>
+                  <div
+                    className="text-xl font-extrabold"
+                    style={{ color: "var(--ios-yellow)", letterSpacing: "-0.03em" }}
+                  >
+                    {s.num}
+                  </div>
+                  <div className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.6)" }}>
+                    {s.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* Categories */}
-      <section className="container mx-auto px-4 mb-16">
-        <h2 className="text-3xl font-oswald font-bold uppercase text-brand-dark mb-6">
-          Категории товаров
-        </h2>
+      {/* ─── CATEGORIES ─── */}
+      <section className="container mx-auto px-4 pt-12 pb-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <div className="section-eyebrow mb-1">Разделы</div>
+            <h2
+              className="text-3xl font-extrabold"
+              style={{ color: "var(--ios-black)", letterSpacing: "-0.04em" }}
+            >
+              Категории
+            </h2>
+          </div>
+          <Link
+            to="/catalog"
+            className="text-sm font-bold tappable"
+            style={{ color: "var(--ios-yellow)" }}
+          >
+            Все →
+          </Link>
+        </div>
+
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-          {CATEGORIES.map((cat) => (
+          {CATEGORIES.map((cat, i) => (
             <Link
               key={cat.id}
               to={`/catalog?category=${cat.id}`}
-              className="group flex flex-col items-center text-center p-4 bg-white rounded-xl border border-gray-100 hover:border-brand-orange hover:shadow-lg transition-all card-hover"
+              className="group card-float tappable flex flex-col items-center text-center p-4"
+              style={{ animationDelay: `${i * 0.04}s` }}
             >
-              <div className="w-12 h-12 bg-brand-orange/10 group-hover:bg-brand-orange rounded-xl flex items-center justify-center mb-3 transition-colors">
-                <Icon name={cat.icon as "Package"} size={22} className="text-brand-orange group-hover:text-white transition-colors" />
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 transition-all"
+                style={{ background: "var(--ios-yellow-dim)" }}
+              >
+                <Icon
+                  name={cat.icon as "Package"}
+                  size={22}
+                  style={{ color: "var(--ios-black)" }}
+                />
               </div>
-              <span className="text-xs font-semibold text-brand-dark leading-tight">{cat.name}</span>
-              <span className="text-xs text-gray-400 mt-1">{cat.count} товаров</span>
+              <span
+                className="text-xs font-bold leading-tight"
+                style={{ color: "var(--ios-black)" }}
+              >
+                {cat.name}
+              </span>
+              <span className="text-[10px] mt-1" style={{ color: "var(--ios-gray3)" }}>
+                {cat.count}
+              </span>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Hot deals */}
-      {PROMO_PRODUCTS.length > 0 && (
-        <section className="bg-brand-dark py-16 mb-16">
+      {/* ─── HOT DEALS ─── */}
+      {PROMO.length > 0 && (
+        <section
+          className="py-12 mt-6"
+          style={{ background: "var(--ios-black)" }}
+        >
           <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-oswald font-bold uppercase text-white flex items-center gap-3">
-                <span className="bg-red-500 text-white text-sm px-3 py-1 rounded font-bold">HOT</span>
-                Товары недели
-              </h2>
-              <Link to="/promotions" className="text-brand-orange hover:text-brand-orange-light text-sm font-medium flex items-center gap-1 transition-colors">
-                Все акции <Icon name="ArrowRight" size={16} />
+            <div className="flex items-center justify-between mb-7">
+              <div>
+                <div
+                  className="section-eyebrow mb-1"
+                  style={{ color: "var(--ios-gray3)" }}
+                >
+                  Горячие предложения
+                </div>
+                <h2
+                  className="text-3xl font-extrabold text-white"
+                  style={{ letterSpacing: "-0.04em" }}
+                >
+                  Акции{" "}
+                  <span
+                    className="text-sm font-extrabold px-2 py-1 rounded-full ml-1"
+                    style={{ background: "var(--ios-yellow)", color: "var(--ios-black)" }}
+                  >
+                    HOT
+                  </span>
+                </h2>
+              </div>
+              <Link
+                to="/promotions"
+                className="text-sm font-bold tappable"
+                style={{ color: "var(--ios-yellow)" }}
+              >
+                Все акции →
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {PROMO_PRODUCTS.map((p) => (
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {PROMO.slice(0, 3).map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
@@ -140,64 +218,104 @@ export default function Home() {
         </section>
       )}
 
-      {/* Trust */}
-      <section className="container mx-auto px-4 mb-16">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {TRUST_ITEMS.map((item) => (
-            <div key={item.title} className="flex items-start gap-4 p-5 bg-white rounded-xl border border-gray-100 hover:border-brand-orange/30 transition-colors">
-              <div className="w-10 h-10 bg-brand-orange/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Icon name={item.icon as "Shield"} size={20} className="text-brand-orange" />
+      {/* ─── TRUST ─── */}
+      <section className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {TRUST.map((item, i) => (
+            <div
+              key={item.title}
+              className="card-float p-5 flex items-start gap-4 animate-fade-up"
+              style={{ animationDelay: `${i * 0.07}s` }}
+            >
+              <div
+                className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
+                style={{ background: "var(--ios-yellow-dim)" }}
+              >
+                <Icon name={item.icon as "ShieldCheck"} size={20} style={{ color: "var(--ios-black)" }} />
               </div>
               <div>
-                <div className="font-bold text-brand-dark text-sm">{item.title}</div>
-                <div className="text-gray-500 text-xs mt-0.5">{item.desc}</div>
+                <div className="font-bold text-sm" style={{ color: "var(--ios-black)", letterSpacing: "-0.02em" }}>
+                  {item.title}
+                </div>
+                <div className="text-xs mt-0.5" style={{ color: "var(--ios-gray3)" }}>
+                  {item.desc}
+                </div>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* All products preview */}
-      <section className="container mx-auto px-4 mb-16">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-oswald font-bold uppercase text-brand-dark">
-            Популярные товары
-          </h2>
+      {/* ─── POPULAR ─── */}
+      <section className="container mx-auto px-4 pb-16">
+        <div className="flex items-center justify-between mb-7">
+          <div>
+            <div className="section-eyebrow mb-1">Выбор профессионалов</div>
+            <h2
+              className="text-3xl font-extrabold"
+              style={{ color: "var(--ios-black)", letterSpacing: "-0.04em" }}
+            >
+              Популярное
+            </h2>
+          </div>
           <Link
             to="/catalog"
-            className="flex items-center gap-2 text-brand-orange hover:text-brand-orange-light font-medium text-sm transition-colors"
+            className="text-sm font-bold tappable"
+            style={{ color: "var(--ios-yellow)" }}
           >
-            Весь каталог <Icon name="ArrowRight" size={16} />
+            Каталог →
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {PRODUCTS.slice(0, 8).map((p) => (
-            <ProductCard key={p.id} product={p} />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {POPULAR.map((p, i) => (
+            <div
+              key={p.id}
+              className="animate-fade-up"
+              style={{ animationDelay: `${i * 0.06}s` }}
+            >
+              <ProductCard product={p} />
+            </div>
           ))}
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="container mx-auto px-4 mb-16">
-        <div className="bg-brand-orange rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-6 overflow-hidden relative">
-          <div className="absolute right-0 top-0 bottom-0 w-64 opacity-10">
-            <Icon name="Hammer" size={200} className="text-white" />
-          </div>
-          <div className="flex-1 relative">
-            <h2 className="text-3xl font-oswald font-bold uppercase text-white mb-2">
-              Нужна консультация?
-            </h2>
-            <p className="text-orange-100 text-lg">
-              Наши эксперты помогут подобрать материалы для вашего проекта
-            </p>
-          </div>
-          <button
-            onClick={() => navigate("/contacts")}
-            className="flex items-center gap-2 bg-white text-brand-orange font-bold py-4 px-8 rounded-xl text-lg hover:bg-gray-100 transition-colors flex-shrink-0"
+      {/* ─── CTA ─── */}
+      <section className="container mx-auto px-4 pb-16">
+        <div
+          className="relative rounded-3xl overflow-hidden p-10 md:p-14"
+          style={{ background: "var(--ios-yellow)" }}
+        >
+          <div
+            className="absolute right-0 top-0 bottom-0 w-64 opacity-[0.08] flex items-center justify-center"
           >
-            <Icon name="Phone" size={20} />
-            Связаться
-          </button>
+            <Icon name="Hammer" size={220} style={{ color: "#000" }} />
+          </div>
+          <div className="relative max-w-lg">
+            <div
+              className="section-eyebrow mb-2"
+              style={{ color: "rgba(0,0,0,0.45)" }}
+            >
+              Нужна помощь?
+            </div>
+            <h2
+              className="text-3xl md:text-4xl font-extrabold mb-3"
+              style={{ color: "var(--ios-black)", letterSpacing: "-0.04em" }}
+            >
+              Консультация эксперта
+            </h2>
+            <p className="mb-6 text-base" style={{ color: "rgba(0,0,0,0.55)" }}>
+              Подберём материалы под ваш проект, рассчитаем смету и организуем доставку
+            </p>
+            <Link
+              to="/contacts"
+              className="tappable inline-flex items-center gap-2.5 bg-[var(--ios-black)] text-white font-bold px-7 py-4 text-sm"
+              style={{ borderRadius: 14 }}
+            >
+              <Icon name="Phone" size={16} />
+              Связаться
+            </Link>
+          </div>
         </div>
       </section>
     </main>

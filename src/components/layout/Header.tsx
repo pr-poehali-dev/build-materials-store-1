@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { useCart } from "@/context/CartContext";
 
@@ -13,9 +13,21 @@ const NAV_LINKS = [
 
 export default function Header() {
   const [search, setSearch] = useState("");
+  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { totalItems } = useCart();
+  const location = useLocation();
+  const { totalItems, island } = useCart();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,106 +38,155 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-brand-dark border-b border-brand-charcoal shadow-lg">
-      <div className="container mx-auto px-4">
-        {/* Top bar */}
-        <div className="flex items-center justify-between py-3 border-b border-brand-charcoal/50">
-          <div className="flex items-center gap-6 text-sm text-gray-400">
-            <a href="tel:+78001234567" className="flex items-center gap-1.5 hover:text-brand-orange transition-colors">
-              <Icon name="Phone" size={14} />
-              <span>8 800 123-45-67</span>
-              <span className="text-xs text-green-400 ml-1">бесплатно</span>
-            </a>
-            <span className="hidden md:block">Пн–Сб: 8:00–20:00</span>
-          </div>
-          <div className="flex items-center gap-4 text-sm text-gray-400">
-            <span className="hidden md:flex items-center gap-1">
-              <Icon name="MapPin" size={14} />
-              Москва
-            </span>
-            <a href="#callback" className="text-brand-orange hover:text-brand-orange-light transition-colors font-medium">
-              Перезвоним за 30 сек
-            </a>
-          </div>
-        </div>
-
-        {/* Main header */}
-        <div className="flex items-center gap-4 py-3">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-9 h-9 bg-brand-orange rounded flex items-center justify-center">
-              <Icon name="Hammer" size={20} className="text-white" />
-            </div>
-            <div className="hidden sm:block">
-              <div className="text-white font-oswald text-lg font-bold leading-tight tracking-wide">СТРОЙБАЗА</div>
-              <div className="text-gray-400 text-xs leading-tight">строительные материалы</div>
-            </div>
-          </Link>
-
-          {/* Search */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
-            <div className="relative">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Поиск по товарам, артикулу, бренду..."
-                className="w-full bg-brand-charcoal text-white placeholder-gray-500 rounded-lg pl-4 pr-12 py-3 text-sm border border-brand-gray focus:border-brand-orange focus:outline-none transition-colors"
+    <>
+      <header
+        className={`sticky top-0 z-50 transition-all duration-300 ${
+          scrolled ? "glass shadow-float" : "bg-[var(--ios-bg)]"
+        }`}
+      >
+        {/* Dynamic Island notification */}
+        {island && (
+          <div
+            className={`absolute left-1/2 -translate-x-1/2 top-3 z-50 ${
+              island.visible ? "island-enter" : "island-exit"
+            }`}
+          >
+            <div className="flex items-center gap-3 bg-[var(--ios-black)] text-white rounded-2xl px-4 py-2.5 shadow-2xl min-w-[260px]">
+              <img
+                src={island.product.image}
+                alt=""
+                className="w-9 h-9 rounded-xl object-cover flex-shrink-0"
               />
-              <button
-                type="submit"
-                className="absolute right-0 top-0 bottom-0 px-4 bg-brand-orange hover:bg-brand-orange-light rounded-r-lg flex items-center justify-center transition-colors"
+              <div className="flex-1 min-w-0">
+                <div className="text-[11px] text-[var(--ios-gray4)] font-semibold uppercase tracking-wider">
+                  Добавлено в корзину
+                </div>
+                <div className="text-sm font-bold truncate leading-tight mt-0.5">
+                  {island.product.name}
+                </div>
+              </div>
+              <Link
+                to="/cart"
+                className="btn-yellow text-xs font-bold px-3 py-1.5 rounded-xl flex-shrink-0 tappable"
               >
-                <Icon name="Search" size={18} className="text-white" />
-              </button>
+                Корзина
+              </Link>
             </div>
-          </form>
+          </div>
+        )}
 
-          {/* Actions */}
-          <div className="flex items-center gap-2">
+        <div className="container mx-auto">
+          {/* Top micro-bar */}
+          <div className="flex items-center justify-between py-2 border-b border-[var(--ios-gray6)]">
+            <div className="flex items-center gap-5 text-xs text-[var(--ios-gray3)] font-medium">
+              <a
+                href="tel:+78001234567"
+                className="flex items-center gap-1.5 hover:text-[var(--ios-black)] transition-colors tappable"
+              >
+                <Icon name="Phone" size={12} />
+                8 800 123-45-67
+                <span className="text-[var(--ios-green)] font-semibold">бесплатно</span>
+              </a>
+              <span className="hidden md:block">Пн–Сб: 8:00–20:00</span>
+            </div>
+            <button className="text-xs font-semibold text-[var(--ios-yellow)] hover:opacity-70 transition-opacity tappable">
+              Перезвоним за 30 сек →
+            </button>
+          </div>
+
+          {/* Main row */}
+          <div className="flex items-center gap-4 py-3">
+            <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 tappable">
+              <div className="w-9 h-9 bg-[var(--ios-black)] rounded-xl flex items-center justify-center shadow-float">
+                <Icon name="Hammer" size={18} className="text-[var(--ios-yellow)]" />
+              </div>
+              <div className="hidden sm:block">
+                <div
+                  style={{ fontFamily: "Manrope, sans-serif", letterSpacing: "-0.04em" }}
+                  className="text-[var(--ios-black)] text-[17px] font-extrabold leading-tight"
+                >
+                  СТРОЙБАЗА
+                </div>
+                <div className="text-[var(--ios-gray3)] text-[10px] font-semibold tracking-wide uppercase">
+                  стройматериалы
+                </div>
+              </div>
+            </Link>
+
+            <form onSubmit={handleSearch} className="flex-1 max-w-xl">
+              <div className="relative">
+                <Icon
+                  name="Search"
+                  size={15}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ios-gray3)] pointer-events-none"
+                />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Поиск товаров, артикулов, брендов…"
+                  className="w-full bg-[var(--ios-gray6)] text-[var(--ios-black)] placeholder-[var(--ios-gray3)] rounded-xl pl-10 pr-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--ios-yellow)] transition-all"
+                />
+              </div>
+            </form>
+
             <Link
               to="/cart"
-              className="relative flex items-center gap-2 bg-brand-orange hover:bg-brand-orange-light text-white px-4 py-3 rounded-lg transition-colors font-medium text-sm"
+              className="relative flex items-center gap-2 bg-[var(--ios-black)] text-white px-4 py-3 rounded-xl font-bold text-sm tappable"
             >
-              <Icon name="ShoppingCart" size={18} />
+              <Icon name="ShoppingBag" size={17} />
               <span className="hidden sm:block">Корзина</span>
               {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-[var(--ios-yellow)] text-[var(--ios-black)] text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center shadow-yellow">
                   {totalItems}
                 </span>
               )}
             </Link>
+
+            <button
+              className="md:hidden text-[var(--ios-gray2)] tappable"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              <Icon name={menuOpen ? "X" : "Menu"} size={22} />
+            </button>
           </div>
 
-          {/* Mobile menu toggle */}
-          <button
-            className="md:hidden text-gray-400 hover:text-white"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            <Icon name={menuOpen ? "X" : "Menu"} size={24} />
-          </button>
+          {/* Nav */}
+          <nav className={`${menuOpen ? "block" : "hidden"} md:block pb-2`}>
+            <ul className="flex flex-col md:flex-row md:items-center gap-0.5">
+              {NAV_LINKS.map((link) => {
+                const active = location.pathname === link.to;
+                return (
+                  <li key={link.to}>
+                    <Link
+                      to={link.to}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all tappable ${
+                        active
+                          ? "bg-[var(--ios-black)] text-[var(--ios-yellow)]"
+                          : "text-[var(--ios-gray2)] hover:text-[var(--ios-black)] hover:bg-[var(--ios-gray6)]"
+                      }`}
+                    >
+                      {link.label}
+                      {link.label === "Акции" && (
+                        <span className="bg-[var(--ios-yellow)] text-[var(--ios-black)] text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                          HOT
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
         </div>
+      </header>
 
-        {/* Navigation */}
-        <nav className={`${menuOpen ? "block" : "hidden"} md:block pb-3`}>
-          <ul className="flex flex-col md:flex-row md:items-center gap-1 md:gap-0">
-            {NAV_LINKS.map((link) => (
-              <li key={link.to}>
-                <Link
-                  to={link.to}
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center px-4 py-2 text-sm text-gray-300 hover:text-brand-orange hover:bg-brand-charcoal rounded-lg transition-all font-medium"
-                >
-                  {link.label}
-                  {link.label === "Акции" && (
-                    <span className="ml-2 bg-brand-orange text-white text-xs px-1.5 py-0.5 rounded font-bold">HOT</span>
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
-    </header>
+      {menuOpen && (
+        <div
+          className="fixed inset-0 backdrop-blur-overlay z-40 md:hidden"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+    </>
   );
 }
