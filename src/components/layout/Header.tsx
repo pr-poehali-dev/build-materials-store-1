@@ -103,7 +103,7 @@ export default function Header() {
               <div className="hidden sm:block">
                 <div
                   style={{ fontFamily: "Manrope, sans-serif", letterSpacing: "-0.04em" }}
-                  className="text-[var(--ios-black)] text-[17px] font-extrabold leading-tight mx-1.5"
+                  className="text-[var(--ios-black)] text-[17px] font-extrabold leading-tight my-[3px] py-0 rounded-0 px-0 mx-0"
                 >СТРОЙЦЕНТР</div>
                 <div className="text-[var(--ios-gray3)] text-[10px] font-semibold tracking-wide uppercase">
                   стройматериалы
